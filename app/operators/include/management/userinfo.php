@@ -42,17 +42,19 @@ $_input_descriptors0[] = array( 'id' => 'workphone',
 $_input_descriptors0[] = array(
                                 'id' => 'firstname',
                                 'name' => 'firstname',
-                                'caption' => 'Full Name', //t('ContactInfo','FirstName'),
+                                'caption' => 'FirstName,
                                 'type' => 'text',
                                 'value' => ((isset($ui_firstname)) ? $ui_firstname : ''),
+                                'style' => 'display: inline-block; width: 48%; margin-right: 4%;'
                             );
 
 $_input_descriptors0[] = array(
                                 'id' => 'lastname',
                                 'name' => 'lastname',
-                                'caption' => 'Location\Postion', //t('ContactInfo','LastName'),
+                                'caption' => 'LastName',
                                 'type' => 'text',
                                 'value' => ((isset($ui_lastname)) ? $ui_lastname : ''),
+                                'style' => 'display: inline-block; width: 48%; margin-right: 4%;'
                             );
 
 $_input_descriptors0[] = array(
