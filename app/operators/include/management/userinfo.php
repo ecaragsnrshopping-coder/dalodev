@@ -34,10 +34,10 @@ if (strpos($_SERVER['PHP_SELF'], '/include/management/userinfo.php') !== false) 
 $_input_descriptors0 = array();
 
 $_input_descriptors0[] = array( 'id' => 'workphone',
-                                'caption' => t('ContactInfo','WorkPhone1'),
+                                'caption' => t('ContactInfo','WorkPhone'),
                                 'type' => 'text',
                                 'value' => ((isset($ui_workphone)) ? $ui_workphone : ''),
-                                'name' => 'workphone' );
+                                'name' => 'workphone1' );
 
 $_input_descriptors0[] = array(
                                 'id' => 'firstname',
