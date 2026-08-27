@@ -46,7 +46,6 @@
 
     $valid_groups = get_groups();
     $valid_planNames = get_plans();
-
     // if cleartext passwords are not allowed, 
     // we remove Cleartext-Password from the $valid_passwordTypes array
     $cleartextPasswordAllowed = (!isset($configValues['CONFIG_DB_PASSWORD_ENCRYPTION']) ||
@@ -88,10 +87,10 @@
 
                     $arr = explode(",", $csvLine);
 
-                    if (count($arr) != 5) {
+                    if (count($arr) < 5) {
                         continue;
                     }
-
+/* origgggggggggg
                     list($username, $password, $email, $firstname, $lastname) = $arr;
                     $username = trim($username);
                     $password = trim($password);
@@ -105,7 +104,24 @@
                         preg_match(FIRST_LAST_NAME_REGEX, $lastname) === 1 &&
                         !array_key_exists($username, $data)) {
                         $data[$username] = array( $password, $email, $firstname, $lastname );
-                    }
+                    } */
+
+		    $username = trim($arr[0]);
+		    $password = trim($arr[1]);
+                    $email = trim($arr[2]);
+                    $firstname = trim($arr[3]);
+                    $lastname = trim($arr[4]);
+// Capture the 6th column if it exists
+                    $mac_list = isset($arr[5]) ? trim($arr[5]) : ""; 
+
+                    if (preg_match(EMAIL_LIKE_USERNAME_REGEX, $username) === 1 &&
+                    preg_match(SAFE_PASSWORD_REGEX, $password) === 1 &&
+                    preg_match(FIRST_LAST_NAME_REGEX, $firstname) === 1 &&
+                    preg_match(FIRST_LAST_NAME_REGEX, $lastname) === 1 &&
+                    !array_key_exists($username, $data)) {
+// We add the mac_list to the data array so we can use it later
+                    $data[$username] = array( $password, $email, $firstname, $lastname, $mac_list );
+                   }
                 }
 
 
@@ -149,8 +165,9 @@
 
                 $counter = 0;
                 foreach ($data as $subject => $arr) {
-                    list( $value, $email, $firstname, $lastname ) = $arr;
-                    
+		$mac_list = $arr[4] ?? "";
+//                    list( $value, $email, $firstname, $lastname ) = $arr;
+                    list( $value, $email, $firstname, $lastname, $mac_list ) = $arr;
                     // skipping this user if it exists
                     if (user_exists($dbSocket, $subject)) {
                         continue;
@@ -167,6 +184,18 @@
                             continue;
                         }
                     }
+		    if (!empty($mac_list)) {
+        		// Support both comma and pipe separators
+        	    $macs = preg_split('/[,|]+/', $mac_list); 
+                    $macs = array_slice($macs, 0, 10);
+		    foreach ($macs as $mac) {
+                        $mac = trim($mac);
+                    if (!empty($mac)) {
+                	// Insert as Calling-Station-Id with the correct operator
+                	insert_single_attribute($dbSocket, $subject, 'Calling-Station-Id', ':=', $mac);
+            }
+        }
+    }
 
                     // adding user info
                     $params = array(
@@ -329,9 +358,12 @@
                                         "caption" => t('all','CSVData'),
                                         "type" => "textarea",
                                         "name" => "csvdata",
-                                        "tooltipText" => 'Paste a CSV-formatted data input of users, expected format is: ' .
-                                                         'username,password,email,firstname,lastname. ' .
-                                                         'Note: any CSV fields beyond the first 5 are ignored.',
+                                        /*"tooltipText" => 'Paste a CSV-formatted data input of users, expected format is: ' .
+                                                         'Username,Password,Email,Fullname,Location\Postion. ' .
+                                                         'Note: any CSV fields beyond the first 5 are ignored.', */
+					"tooltipText" => 'Paste a CSV-formatted data input of users, expected format is: ' .
+                 			'Username,Password,Email,Fullname,Location\Position,MAC1|MAC2|MAC3. ' .
+                 			'Note: Multiple MACs can be separated by | or commas.',
                                         "content" => ((isset($failureMsg)) ? $csvdata : ""),
                                      );
 

@@ -91,6 +91,8 @@
             // first we check user portal login password
             $ui_PortalLoginPassword = (isset($_POST['portalLoginPassword']) && !empty(trim($_POST['portalLoginPassword'])))
                                     ? trim($_POST['portalLoginPassword']) : "";
+            
+
 
             // these are forced to 0 (disabled) if user portal login password is empty
             $ui_changeuserinfo = (!empty($ui_PortalLoginPassword) && isset($_POST['changeUserInfo']) && $_POST['changeUserInfo'] === '1')
@@ -148,12 +150,23 @@
             if ($authType == "userAuth") {
                 // we can add a new record to the check table
                 // only if $username and $password are not empty
-                if (!empty($username) && !empty($password)) {
+                //if (!empty($username) && !empty($password)) {
+                //    $username_to_check = $username;
+                //} else {
+                //    $failureMsg = "Username and/or password are invalid";
+
+                //}
+
+                if (!empty($username) && !empty($password) && !empty(trim($firstname))) {
                     $username_to_check = $username;
                 } else {
-                    $failureMsg = "Username and/or password are invalid";
-
-                }
+                // If any of the three are missing, trigger the failure
+                   if (empty(trim($firstname))) {
+                       $failureMsg = "Full Name is a required field";
+                 } else {
+                       $failureMsg = "Username and/or password are invalid";
+                 }
+               }
             } else if ($authType == "macAuth") {
                 if (!empty($macaddress)) {
                     $username_to_check = $macaddress;

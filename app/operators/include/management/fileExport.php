@@ -115,21 +115,33 @@ switch ($reportType) {
 
         break;
 
-    case "usernameListGeneric":
+/*    case "usernameListGeneric":
         // we use this associative array for generating both,
         // Output Header and SQL selected fields
         $cols = array(
                         "Id" => "ui.id",
-                        "Fullname" => "CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname",
-                        "Username" => "rc.username",
+                        //"Fullname" => "CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname",
+                        "Full Name" => "ui.firstname",
+                        "Location / Position" => "ui.lastname",
+			"Username" => "rc.username",
                         "Attribute" => "rc.attribute",
-                        "Auth" => "rc.value"
+			"Password" => "MAX(IF(rc.attribute='Cleartext-Password', rc.value, NULL))",
+                        //"Password" => "rc.value",
+			// This collects all MACs into one comma-separated cell
+                        "MAC Addresses" => "GROUP_CONCAT(DISTINCT IF(rc.attribute='Calling-Station-Id', rc.value, NULL) SEPARATOR ', ')"
                      );
         
         $selected_fields = implode(", ", array_values($cols));
-        $sql = sprintf("SELECT %s FROM %s %s ORDER BY %s ASC",
-                       $selected_fields, $reportTable, $reportQuery, array_values($cols)[0]);
-        $res = $dbSocket->query($sql);
+        //$sql = sprintf("SELECT %s FROM %s %s ORDER BY %s ASC",
+        //               $selected_fields, $reportTable, $reportQuery, array_values($cols)[0]);
+        // IMPORTANT: Added "GROUP BY rc.username" to merge multiple attribute rows into one
+        //$sql = sprintf("SELECT %s FROM %s %s GROUP BY rc.username ORDER BY %s ASC",
+        //               $selected_fields, $reportTable, $reportQuery, array_values($cols)[0]);
+	$sql = "SELECT $selected_fields FROM " . $_SESSION['reportTable'] . " " . $_SESSION['reportQuery'] . " 
+                GROUP BY rc.username 
+                ORDER BY ui.id ASC";
+
+	$res = $dbSocket->query($sql);
         
         // this is the output header
         $output = implode(", ", array_keys($cols)) . "\n";
@@ -139,6 +151,37 @@ switch ($reportType) {
             $output .= implode(",", $row) . "\n";
         }
 
+        break;
+*/
+	case "usernameListGeneric":
+        $cols = array(
+            "Id" => "ui.id",
+            "Full Name" => "ui.firstname",
+            "Location / Position" => "ui.lastname",
+            "Username" => "rc.username",
+            "Password" => "MAX(IF(rc.attribute='Cleartext-Password', rc.value, NULL))",
+            "MAC Addresses" => "GROUP_CONCAT(DISTINCT IF(rc.attribute='Calling-Station-Id', rc.value, NULL) SEPARATOR ' | ')"
+        );
+
+        $selected_fields = implode(", ", array_values($cols));
+        
+        // Using explicit table names instead of variables to avoid session conflicts
+        $sql = "SELECT $selected_fields 
+                FROM radcheck rc 
+                INNER JOIN userinfo ui ON rc.username = ui.username 
+                GROUP BY rc.username 
+                ORDER BY ui.id ASC";
+
+        $res = $dbSocket->query($sql);
+
+        // Header generation
+        $output = implode(",", array_keys($cols)) . "\n";
+
+        while($row = $res->fetchRow(DB_FETCHMODE_ORDERED)) {
+            // Clean data: remove any accidental nulls or line breaks
+            $row = array_map(function($item) { return str_replace(array("\r", "\n"), '', $item); }, $row);
+            $output .= '"' . implode('","', $row) . '"' . "\n";
+        }
         break;
 
     case "reportsOnlineUsers":
