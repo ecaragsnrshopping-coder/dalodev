@@ -80,13 +80,13 @@
             $company = (array_key_exists('company', $_POST) && isset($_POST['company'])) ? $_POST['company'] : "";
             $workphone = (array_key_exists('workphone', $_POST) && isset($_POST['workphone'])) ? $_POST['workphone'] : "";
             $homephone = (array_key_exists('homephone', $_POST) && isset($_POST['homephone'])) ? $_POST['homephone'] : "";
-            $mobilephone = (array_key_exists('mobilephone', $_POST) && isset($_POST['mobilephone'])) ? $_POST['mobilephone'] : "";
+/*            $mobilephone = (array_key_exists('mobilephone', $_POST) && isset($_POST['mobilephone'])) ? $_POST['mobilephone'] : "";
             $address = (array_key_exists('address', $_POST) && isset($_POST['address'])) ? $_POST['address'] : "";
             $city = (array_key_exists('city', $_POST) && isset($_POST['city'])) ? $_POST['city'] : "";
             $state = (array_key_exists('state', $_POST) && isset($_POST['state'])) ? $_POST['state'] : "";
             $country = (array_key_exists('country', $_POST) && isset($_POST['country'])) ? $_POST['country'] : "";
             $zip = (array_key_exists('zip', $_POST) && isset($_POST['zip'])) ? $_POST['zip'] : "";
-            $notes = (isset($_POST['notes']) && !empty(trim($_POST['notes']))) ? trim($_POST['notes']) : "";
+*/          $notes = (isset($_POST['notes']) && !empty(trim($_POST['notes']))) ? trim($_POST['notes']) : "";
 
             // first we check user portal login password
             $ui_PortalLoginPassword = (isset($_POST['portalLoginPassword']) && !empty(trim($_POST['portalLoginPassword'])))
