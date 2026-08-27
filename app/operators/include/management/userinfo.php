@@ -72,7 +72,7 @@ $_input_descriptors1[] = array( 'id' => 'company', 'caption' => t('ContactInfo',
                                'value' => ((isset($ui_company)) ? $ui_company : ''), 'name' => 'company' );
 $_input_descriptors1[] = array( 'id' => 'workphone', 'caption' => t('ContactInfo','WorkPhone'), 'type' => 'text',
                                'value' => ((isset($ui_workphone)) ? $ui_workphone : ''), 'name' => 'workphone' );
-$_input_descriptors1[] = array( 'id' => 'homephone', 'caption' => t('ContactInfo','HomePhone'), 'type' => 'text',
+/*$_input_descriptors1[] = array( 'id' => 'homephone', 'caption' => t('ContactInfo','HomePhone'), 'type' => 'text',
                                'value' => ((isset($ui_homephone)) ? $ui_homephone : ''), 'name' => 'homephone' );
 $_input_descriptors1[] = array( 'id' => 'mobilephone', 'caption' => t('ContactInfo','MobilePhone'), 'type' => 'text',
                                'value' => ((isset($ui_mobilephone)) ? $ui_mobilephone : ''), 'name' => 'mobilephone' );
@@ -86,7 +86,7 @@ $_input_descriptors1[] = array( 'id' => 'country', 'caption' => t('ContactInfo',
                                'value' => ((isset($ui_country)) ? $ui_country : ''), 'name' => 'country' );
 $_input_descriptors1[] = array( 'id' => 'zip', 'caption' => t('ContactInfo','Zip'), 'type' => 'text',
                                'value' => ((isset($ui_zip)) ? $ui_zip : ''), 'name' => 'zip' );
-
+*/
 $_input_descriptors2 = array();
 
 $_input_descriptors2[] = array(
