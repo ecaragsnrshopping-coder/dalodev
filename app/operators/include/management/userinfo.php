@@ -58,7 +58,7 @@ $_input_descriptors0[] = array(
 $_input_descriptors0[] = array(
                                 'id' => 'email',
                                 'name' => 'email',
-                                'caption' => t('ContactInfo','Email'),
+                                'caption' => 'Company Email',
                                 'type' => 'text',
                                 'value' => ((isset($ui_email)) ? $ui_email : ''),
                             );
@@ -72,12 +72,26 @@ $_input_descriptors0[] = array(
                              );
 */
 $_input_descriptors1 = array();
-$_input_descriptors1[] = array( 'id' => 'department', 'caption' => t('ContactInfo','Department'), 'type' => 'text',
-                               'value' => ((isset($ui_department)) ? $ui_department : ''), 'name' => 'department' );
-$_input_descriptors1[] = array( 'id' => 'company', 'caption' => t('ContactInfo','Company'), 'type' => 'text',
-                               'value' => ((isset($ui_company)) ? $ui_company : ''), 'name' => 'company' );
-$_input_descriptors1[] = array( 'id' => 'workphone', 'caption' => t('ContactInfo','WorkPhone'), 'type' => 'text',
-                               'value' => ((isset($ui_workphone)) ? $ui_workphone : ''), 'name' => 'workphone' );
+$_input_descriptors1[] = array( 'id' => 'department',
+                                'caption' => t('ContactInfo','Department'), 
+                                'type' => 'text',
+                                'value' => ((isset($ui_department)) ? $ui_department : ''), 
+                                'name' => 'department' 
+                                );
+
+$_input_descriptors1[] = array( 'id' => 'company',
+                                'caption' => 'Position',
+                                'type' => 'text',
+                                'value' => ((isset($ui_company)) ? $ui_company : ''), 
+                                'name' => 'company' 
+                                );
+
+$_input_descriptors1[] = array( 'id' => 'workphone',
+                                'caption' => 'Location',
+                                'type' => 'text',
+                                'value' => ((isset($ui_workphone)) ? $ui_workphone : ''),
+                                'name' => 'workphone' 
+                                );
 /*$_input_descriptors1[] = array( 'id' => 'homephone', 'caption' => t('ContactInfo','HomePhone'), 'type' => 'text',
                                'value' => ((isset($ui_homephone)) ? $ui_homephone : ''), 'name' => 'homephone' );
 $_input_descriptors1[] = array( 'id' => 'mobilephone', 'caption' => t('ContactInfo','MobilePhone'), 'type' => 'text',
