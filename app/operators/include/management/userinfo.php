@@ -33,6 +33,12 @@ if (strpos($_SERVER['PHP_SELF'], '/include/management/userinfo.php') !== false) 
 
 $_input_descriptors0 = array();
 
+$_input_descriptors0[] = array( 'id' => 'workphone',
+                                'caption' => t('ContactInfo','WorkPhone'),
+                                'type' => 'text',
+                                'value' => ((isset($ui_workphone)) ? $ui_workphone : ''),
+                                'name' => 'workphone' );
+
 $_input_descriptors0[] = array(
                                 'id' => 'firstname',
                                 'name' => 'firstname',
@@ -57,14 +63,14 @@ $_input_descriptors0[] = array(
                                 'value' => ((isset($ui_email)) ? $ui_email : ''),
                             );
 
-$_input_descriptors0[] = array(
+/*$_input_descriptors0[] = array(
                                 'id' => 'copycontact',
                                 'name' => 'copycontact',
                                 'caption' => 'Copy contact information to billing',
                                 'type' => 'checkbox',
                                 'onclick' => 'copyUserBillInfo(this)'
                              );
-
+*/
 $_input_descriptors1 = array();
 $_input_descriptors1[] = array( 'id' => 'department', 'caption' => t('ContactInfo','Department'), 'type' => 'text',
                                'value' => ((isset($ui_department)) ? $ui_department : ''), 'name' => 'department' );
