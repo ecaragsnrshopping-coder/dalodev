@@ -67,7 +67,7 @@
                     //"id" => t('all','ID'), //delete
                     //"fullname" => t('all','Name'),
                     //"username" => t('all','Username'),
-                    "department" => 'Employee ID',
+                    "workphone" => 'Employee ID',
                     "fullname"   => 'Full Name',
                     "loc_pos"    => 'Location / Position',
                     "username"   => t('all','Username'),
@@ -185,7 +185,7 @@
             $records[$this_username] = array(
                 'auth' => $row['auth'],
                 //'fullname' => $row['fullname'],
-		'firstname' => $row['firstname'],
+		        'firstname' => $row['firstname'],
                 'lastname' => $row['lastname'],
                 'enabled' => true,
                 'groups' => array(),
