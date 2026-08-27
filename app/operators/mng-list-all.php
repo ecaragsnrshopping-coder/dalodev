@@ -360,8 +360,8 @@
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
             }
 
-            $table_row[] = $lastlogin;
-            $table_row[] = $grouplist;
+           // $table_row[] = $lastlogin;
+            //$table_row[] = $grouplist;
 
             // create checkbox
             /*$d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
