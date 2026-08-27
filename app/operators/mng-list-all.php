@@ -132,7 +132,7 @@
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
     */
     // Fetch individual fields to concatenate in PHP
-    $sql = sprintf("SELECT ui.department, ui.firstname, ui.lastname, ui.workphone, ui.company,
+    $sql = sprintf("SELECT ui.department, ui.firstname, ui.lastname, ui.city, ui.company,
                            rc.username AS username, rc.value AS auth, rc.attribute
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
