@@ -136,6 +136,7 @@
                            rc.username AS username, rc.value AS auth, rc.attribute
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
+
     $res = $dbSocket->query($sql);
     $logDebugSQL .= "$sql;\n";
     $numrows = $res->numRows();
@@ -185,6 +186,7 @@
             $records[$this_username] = array(
                 'auth' => $row['auth'],
                 //'fullname' => $row['fullname'],
+                'workphone' => $row['workphone'],
 		        'firstname' => $row['firstname'],
                 'lastname' => $row['lastname'],
                 'enabled' => true,
