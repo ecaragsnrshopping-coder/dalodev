@@ -42,7 +42,7 @@ $_input_descriptors0[] = array( 'id' => 'workphone',
 $_input_descriptors0[] = array(
                                 'id' => 'firstname',
                                 'name' => 'firstname',
-                                'caption' => 'FirstName,
+                                'caption' => 'FirstName',
                                 'type' => 'text',
                                 'value' => ((isset($ui_firstname)) ? $ui_firstname : ''),;
                             );
