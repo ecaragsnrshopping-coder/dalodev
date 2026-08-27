@@ -345,7 +345,7 @@
             // create tooltip
             $tooltip = get_tooltip_list_str($tooltip);
 
-
+//THISS update here
             // Extract workphone as Employee ID
             $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
 
@@ -353,8 +353,15 @@
             $d = array( 'name' => 'username[]', 'value' => $username );
             $checkbox = get_checkbox_str($d);
 
-            // Join checkbox HTML directly with Employee ID text
+            // define table row (Checkbox + Employee ID, Firstname, Lastname, Tooltip)
             $table_row = array( $checkbox . ' ' . $emp_id, $firstname, $lastname, $tooltip );
+
+            if (!$hiddenPassword) {
+                $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
+            }
+
+            $table_row[] = $lastlogin;
+            $table_row[] = $grouplist;
 
             // create checkbox
             /*$d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
