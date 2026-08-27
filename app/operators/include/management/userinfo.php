@@ -85,13 +85,12 @@ $_input_descriptors1[] = array( 'id' => 'company',
                                 'value' => ((isset($ui_company)) ? $ui_company : ''), 
                                 'name' => 'company' 
                                 );
-
-$_input_descriptors1[] = array( 'id' => 'workphone',
-                                'caption' => 'Location',
+$_input_descriptors1[] = array( 'id' => 'city',
+                                'caption' => 'Location', 
                                 'type' => 'text',
-                                'value' => ((isset($ui_workphone)) ? $ui_workphone : ''),
-                                'name' => 'workphone' 
-                                );
+                                'value' => ((isset($ui_city)) ? $ui_city : ''),
+                                'name' => 'city' );
+
 /*$_input_descriptors1[] = array( 'id' => 'homephone', 'caption' => t('ContactInfo','HomePhone'), 'type' => 'text',
                                'value' => ((isset($ui_homephone)) ? $ui_homephone : ''), 'name' => 'homephone' );
 $_input_descriptors1[] = array( 'id' => 'mobilephone', 'caption' => t('ContactInfo','MobilePhone'), 'type' => 'text',
