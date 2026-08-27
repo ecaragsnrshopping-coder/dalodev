@@ -45,7 +45,6 @@ $_input_descriptors0[] = array(
                                 'caption' => 'FirstName,
                                 'type' => 'text',
                                 'value' => ((isset($ui_firstname)) ? $ui_firstname : ''),
-                                'style' => 'display: inline-block; width: 48%; margin-right: 4%;'
                             );
 
 $_input_descriptors0[] = array(
@@ -54,7 +53,6 @@ $_input_descriptors0[] = array(
                                 'caption' => 'LastName',
                                 'type' => 'text',
                                 'value' => ((isset($ui_lastname)) ? $ui_lastname : ''),
-                                'style' => 'display: inline-block; width: 48%; margin-right: 4%;'
                             );
 
 $_input_descriptors0[] = array(
