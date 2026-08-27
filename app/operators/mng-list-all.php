@@ -40,6 +40,7 @@
     // set session's page variable
     $_SESSION['PREV_LIST_PAGE'] = $_SERVER['REQUEST_URI'];
 
+
     // print HTML prologue
     $extra_js = array(
         "static/js/ajax.js",
@@ -54,17 +55,30 @@
 
     $hiddenPassword = (strtolower($configValues['CONFIG_IFACE_PASSWORD_HIDDEN']) == "yes");
 
-    // Correct column definition for database sorting/headers
+    // the array $cols has multiple purposes:
+    // - its keys (when non-numerical) can be used
+    //   - for validating user input
+    //   - for table ordering purpose
+    // - its value can be used for table headings presentation
+    //
+    // the variables cols, colspan, and half_colspan
+    // can be used for validation an presentation purpose
     $cols = array(
-        "department" => 'Employee ID',
-        "fullname"   => 'Full Name',
-        "loc_pos"    => 'Location / Position',
-        "username"   => t('all','Username'),
-    );
+                    //"id" => t('all','ID'), //delete
+                    //"fullname" => t('all','Name'),
+                    //"username" => t('all','Username'),
+                    "workphone" => 'Employee ID',
+                    "fullname"   => 'Full Name',
+                    "loc_pos"    => 'Location / Position',
+                    "username"   => t('all','Username'),
+                 );
 
     if (!$hiddenPassword) {
         $cols["auth"] = t('all','Password');
     }
+
+    $cols["lastlogin"] = t('all','LastLoginTime');
+    $cols[] = t('title','Groups');
 
     $colspan = count($cols);
     $half_colspan = intval($colspan / 2);
@@ -72,6 +86,7 @@
     $param_cols = array();
     foreach ($cols as $k => $v) { if (!is_int($k)) { $param_cols[$k] = $v; } }
 
+    // whenever possible we use a whitelist approach
     $orderBy = (array_key_exists('orderBy', $_GET) && isset($_GET['orderBy']) &&
                 in_array($_GET['orderBy'], array_keys($param_cols)))
              ? $_GET['orderBy'] : array_keys($param_cols)[0];
@@ -86,20 +101,38 @@
     include('../common/includes/db_open.php');
     include('include/management/pages_common.php');
 
+    // sql where is like: join_condition AND (nested_condition1)
+
+    // init nested condition 1
     $nested_condition1 = array( "rc.attribute='Auth-Type'", "rc.attribute LIKE '%%-Password'" );
+
+    // init SQL WHERE (with join condition already set)
     $sql_WHERE = array( "rc.username=ui.username" );
+
+    // imploding nested condition 1
     $sql_WHERE[] = sprintf("(%s)", implode(" OR ", $nested_condition1));
 
+    // setup php session variables for exporting
     $_SESSION['reportTable'] = sprintf("%s AS rc LEFT JOIN %s AS ra ON ra.username=rc.username, %s AS ui",
                                        $configValues['CONFIG_DB_TBL_RADCHECK'], $configValues['CONFIG_DB_TBL_RADACCT'],
                                        $configValues['CONFIG_DB_TBL_DALOUSERINFO']);
     $_SESSION['reportQuery'] = " WHERE " . implode(" AND ", $sql_WHERE);
     $_SESSION['reportType'] = "usernameListGeneric";
     
-    $_SESSION['reportQueryColumns'] = "ui.department AS 'Employee ID', CONCAT(ui.lastname, ', ', ui.firstname) AS 'Full Name', CONCAT(ui.city, ' / ', ui.company) AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password'";
-
-    // SELECT query including ui.department and ui.city
-    $sql = sprintf("SELECT ui.id AS id, ui.department, ui.firstname, ui.lastname, ui.city, ui.company,
+    // ADD THIS LINE HERE:
+    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password', MAX(ra.acctstarttime) AS 'Last Login Time'";
+    // we initialize $numrows
+    //$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
+    //                       CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname,
+    //                       MAX(ra.acctstarttime) AS lastlogin
+    /*$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
+                           ui.firstname, ui.lastname,
+                           MAX(ra.acctstarttime) AS lastlogin
+                     FROM %s %s
+                     GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
+    */
+    // Fetch individual fields to concatenate in PHP
+    $sql = sprintf("SELECT ui.department, ui.firstname, ui.lastname, ui.city, ui.company,
                            rc.username AS username, rc.value AS auth, rc.attribute
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
@@ -108,23 +141,37 @@
     $numrows = $res->numRows();
 
     if ($numrows > 0) {
-        include('include/management/pages_numbering.php');
+        /* START - Related to pages_numbering.php */
+
+        // when $numrows is set, $maxPage is calculated inside this include file
+        include('include/management/pages_numbering.php');    // must be included after opendb because it needs to read
+                                                              // the CONFIG_IFACE_TABLES_LISTING variable from the config file
+
+        // here we decide if page numbers should be shown
         $drawNumberLinks = strtolower($configValues['CONFIG_IFACE_TABLES_LISTING_NUM']) == "yes" && $maxPage > 1;
 
+        /* END */
+
+        // we execute and log the actual query
         $sql .= sprintf(" ORDER BY %s %s LIMIT %s, %s", $orderBy, $orderType, $offset, $rowsPerPage);
         $res = $dbSocket->query($sql);
         $logDebugSQL .= "$sql;\n";
 
+        // init $records and $usernamelist arrays
         $records = array();
         $usernamelist = array();
 
         while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+            // we start storing data...
+            // the enable flag is initialized to true
+            // and the groups list is empty
             $this_username = $row['username'];
 
             if (array_key_exists($this_username, $records)) {
                 continue;
             }
 
+            // we try to get the type of this user
             if ($row['attribute'] == 'Auth-Type' && $row['auth'] == 'Accept') {
                 if (preg_match(MACADDR_REGEX, $this_username) || preg_match(IP_REGEX, $this_username)) {
                     $type = 'MAC';
@@ -135,30 +182,32 @@
                 $type = 'USER';
             }
 
-            // Storing 'department' and 'city' into $records
             $records[$this_username] = array(
-                'auth'       => $row['auth'],
-                'department' => $row['department'],
-                'firstname'  => $row['firstname'],
-                'lastname'   => $row['lastname'],
-                'city'       => $row['city'],
-                'company'    => $row['company'],
-                'enabled'    => true,
-                'groups'     => array(),
-                'type'       => $type,
-                'id'         => $row['id']
+                'auth' => $row['auth'],
+                //'fullname' => $row['fullname'],
+		        'firstname' => $row['firstname'],
+                'lastname' => $row['lastname'],
+                'enabled' => true,
+                'groups' => array(),
+                'type' => $type,
+                'id' => $row['id'],
+                'lastlogin' => $row['lastlogin'],
             );
+            // in the same pass we init the $usernamelist
             $usernamelist[] = sprintf("'%s'", $dbSocket->escapeSimple($this_username));
         }
 
         $per_page_numrows = count($usernamelist);
 
         if ($per_page_numrows > 0) {
+
+            // with this second query we retrieve user status (enabled/disabled) and user groups list
             $sql = sprintf("SELECT username, groupname FROM %s WHERE username IN (%s)",
                            $configValues['CONFIG_DB_TBL_RADUSERGROUP'], implode(", ", $usernamelist));
             $res = $dbSocket->query($sql);
             $logDebugSQL .= "$sql;\n";
 
+            // foreach user we update the enabled flag and the grouplist
             while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
                 $this_username = $row['username'];
                 $this_groupname = $row['groupname'];
@@ -172,111 +221,161 @@
             }
         }
 
+        // this can be passed as form attribute and
+        // printTableFormControls function parameter
         $action = "mng-del.php";
 
+        // we prepare the "controls bar" (aka the table prologue bar)
         $additional_controls = array();
-        $additional_controls[] = array('onclick' => "javascript:removeCheckbox('listall','mng-del.php')", 'label' => 'Delete', 'class' => 'btn-danger');
-        $additional_controls[] = array('onclick' => "disableCheckbox('listall','library/ajax/user_actions.php')", 'label' => 'Disable', 'class' => 'btn-primary');
-        $additional_controls[] = array('onclick' => "enableCheckbox('listall','library/ajax/user_actions.php')", 'label' => 'Enable', 'class' => 'btn-secondary');
-        $additional_controls[] = array('onclick' => "mailCheckbox('listall','library/ajax/user_actions.php')", 'label' => 'Send Mail', 'class' => 'btn-primary');
+        $additional_controls[] = array(
+                                'onclick' => "javascript:removeCheckbox('listall','mng-del.php')",
+                                'label' => 'Delete',
+                                'class' => 'btn-danger',
+                              );
 
+        $additional_controls[] = array(
+                                'onclick' => "disableCheckbox('listall','library/ajax/user_actions.php')",
+                                'label' => 'Disable',
+                                'class' => 'btn-primary',
+                              );
+        $additional_controls[] = array(
+                                'onclick' => "enableCheckbox('listall','library/ajax/user_actions.php')",
+                                'label' => 'Enable',
+                                'class' => 'btn-secondary',
+                              );
+// Add "Send Mail" button
+        $additional_controls[] = array(
+                                'onclick' => "mailCheckbox('listall','library/ajax/user_actions.php')",
+                                'label' => 'Send Mail',
+                                'class' => 'btn-primary',
+                                );
         $descriptors = array();
+
         $descriptors['start'] = array( 'common_controls' => 'username[]', 'additional_controls' => $additional_controls );
 
         $params = array(
-            'num_rows' => $numrows,
-            'rows_per_page' => $rowsPerPage,
-            'page_num' => $pageNum,
-            'order_by' => $orderBy,
-            'order_type' => $orderType,
-        );
+                            'num_rows' => $numrows,
+                            'rows_per_page' => $rowsPerPage,
+                            'page_num' => $pageNum,
+                            'order_by' => $orderBy,
+                            'order_type' => $orderType,
+                        );
         $descriptors['center'] = array( 'draw' => $drawNumberLinks, 'params' => $params );
 
         $descriptors['end'] = array();
         $descriptors['end'][] = array(
-            'onclick' => "location.href='include/management/fileExport.php?reportFormat=csv'",
-            'label' => 'CSV Export',
-            'class' => 'btn-light',
-        );
+                                        'onclick' => "location.href='include/management/fileExport.php?reportFormat=csv'",
+                                        'label' => 'CSV Export',
+                                        'class' => 'btn-light',
+                                     );
         print_table_prologue($descriptors);
 
         $form_descriptor = array( 'form' => array( 'action' => $action, 'method' => 'POST', 'name' => 'listall' ), );
 
+        // print table top
         print_table_top($form_descriptor);
+
+        // second line of table header
         printTableHead($cols, $orderBy, $orderType);
+
+        // closes table header, opens table body
         print_table_middle();
 
+        // table content
         $count = 0;
         foreach ($records as $username => $data) {
             $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
-            $type     = $data['type'];
+            $type = $data['type'];
+            $id = intval($data['id']);
 
             $img_format = '<i class="bi bi-%s-circle-fill text-%s me-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="%s"></i>';
+
             $img = (!$data['enabled'])
                  ? sprintf($img_format, 'dash', 'danger', 'disabled')
                  : sprintf($img_format, 'check', 'success', 'enabled');
 
-            $badge_icon = ($type == 'PIN') ? "123" : (($type == 'MAC') ? "ethernet" : "person-fill");
+            $badge_icon = "";
+            switch ($type) {
+                case 'PIN':
+                    $badge_icon = "123";
+                    break;
+
+                case 'MAC':
+                    $badge_icon = "ethernet";
+                    break;
+
+                default:
+                case 'USER':
+                    $badge_icon = "person-fill";
+                    break;
+            }
+
             $badge = sprintf('<i class="bi bi-%s me-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="%s"></i>',
                              $badge_icon, strtolower($type));
 
-            // Extract values and construct display fields
-            $emp_id    = htmlspecialchars($data['department'] ?? '', ENT_QUOTES, 'UTF-8');
-            $firstname = htmlspecialchars($data['firstname'] ?? '', ENT_QUOTES, 'UTF-8');
-            $lastname  = htmlspecialchars($data['lastname'] ?? '', ENT_QUOTES, 'UTF-8');
-            $location  = htmlspecialchars($data['city'] ?? '', ENT_QUOTES, 'UTF-8');
-            $position  = htmlspecialchars($data['company'] ?? '', ENT_QUOTES, 'UTF-8');
-            $auth      = htmlspecialchars($data['auth'], ENT_QUOTES, 'UTF-8');
+            $auth = htmlspecialchars($data['auth'], ENT_QUOTES, 'UTF-8');
 
-            $fullname = trim($lastname . ', ' . $firstname, ', ');
-            $location_position = trim($location . ' / ' . $position, ' /');
+            //$fullname = htmlspecialchars($data['fullname'], ENT_QUOTES, 'UTF-8');
+            $firstname = htmlspecialchars($data['firstname'], ENT_QUOTES, 'UTF-8');
+            $lastname = htmlspecialchars($data['lastname'], ENT_QUOTES, 'UTF-8');
+            $lastlogin = (!empty($data['lastlogin']))
+                       ? htmlspecialchars($data['lastlogin'], ENT_QUOTES, 'UTF-8') : "(n/a)";
+            $grouplist = implode("<br>", $data['groups']);
 
             $ajax_id = "divContainerUserInfo_" . $count;
             $param = sprintf('username=%s', urlencode($username));
             $onclick = "ajaxGeneric('library/ajax/user_info.php','retBandwidthInfo','$ajax_id','$param')";
             $tooltip = array(
-                'subject' => sprintf('%s%s<span class="badge bg-primary ms-1">%s</span>', $img, $badge, $username),
-                'onclick' => $onclick,
-                'ajax_id' => $ajax_id,
-                'actions' => array(
-                    array('href' => sprintf('mng-edit.php?username=%s', urlencode($username)), 'label' => t('Tooltip','UserEdit')),
-                    array('href' => sprintf('acct-username.php?username=%s', urlencode($username)), 'label' => t('all','Accounting'))
-                )
-            );
+                                'subject' => sprintf('%s%s<span class="badge bg-primary ms-1">%s</span>', $img, $badge, $username),
+                                'onclick' => $onclick,
+                                'ajax_id' => $ajax_id,
+                                'actions' => array(),
+                            );
+            $tooltip['actions'][] = array(
+                                            'href' => sprintf('mng-edit.php?username=%s', urlencode($username), ),
+                                            'label' => t('Tooltip','UserEdit'),
+                                         );
+            $tooltip['actions'][] = array(
+                                            'href' => sprintf('acct-username.php?username=%s', urlencode($username), ),
+                                            'label' => t('all','Accounting'),
+                                         );
+
+            // create tooltip
             $tooltip = get_tooltip_list_str($tooltip);
 
-            // Generate Checkbox string
-            $d = array( 'name' => 'username[]', 'value' => $username );
+            // create checkbox
+            $d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
             $checkbox = get_checkbox_str($d);
 
-            // Explicitly join Checkbox HTML with the Employee ID text
-            $emp_id_column = $checkbox . ' ' . $emp_id;
-
-            // Construct row with Employee ID as column 1
-            $table_row = array(
-                $emp_id_column,     // Checkbox + Employee ID Text
-                $fullname,          // Full Name
-                $location_position, // Location / Position
-                $tooltip            // Username
-            );
-
+            // define table row
+            //$table_row = array( $checkbox, $fullname, $tooltip );
+            $table_row = array( $checkbox, $firstname, $lastname, $tooltip );
             if (!$hiddenPassword) {
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
             }
 
+            $table_row[] = $lastlogin;
+            $table_row[] = $grouplist;
+
+            // print table row
             print_table_row($table_row);
+
             $count++;
         }
 
+        // close tbody,
+        // print tfoot
+        // and close table + form (if any)
         $table_foot = array(
-            'num_rows' => $numrows,
-            'rows_per_page' => $per_page_numrows,
-            'colspan' => $colspan,
-            'multiple_pages' => $drawNumberLinks
-        );
-        $descriptor = array( 'form' => $form_descriptor, 'table_foot' => $table_foot );
+                                'num_rows' => $numrows,
+                                'rows_per_page' => $per_page_numrows,
+                                'colspan' => $colspan,
+                                'multiple_pages' => $drawNumberLinks
+                           );
+        $descriptor = array(  'form' => $form_descriptor, 'table_foot' => $table_foot );
         print_table_bottom($descriptor);
 
+        // get and print "links"
         $links = setupLinks_str($pageNum, $maxPage, $orderBy, $orderType);
         printLinks($links, $drawNumberLinks);
 
@@ -286,6 +385,7 @@
     }
 
     include('../common/includes/db_close.php');
+
     include('include/config/logging.php');
 
     print_footer_and_html_epilogue();
