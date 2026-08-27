@@ -44,7 +44,7 @@ $_input_descriptors0[] = array(
                                 'name' => 'firstname',
                                 'caption' => 'FirstName',
                                 'type' => 'text',
-                                'value' => ((isset($ui_firstname)) ? $ui_firstname : ''),;
+                                'value' => ((isset($ui_firstname)) ? $ui_firstname : ''),
                             );
 
 $_input_descriptors0[] = array(
@@ -52,7 +52,7 @@ $_input_descriptors0[] = array(
                                 'name' => 'lastname',
                                 'caption' => 'LastName',
                                 'type' => 'text',
-                                'value' => ((isset($ui_lastname)) ? $ui_lastname : ''),;
+                                'value' => ((isset($ui_lastname)) ? $ui_lastname : ''),
                             );
 
 $_input_descriptors0[] = array(
