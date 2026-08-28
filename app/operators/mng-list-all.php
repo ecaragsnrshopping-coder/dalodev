@@ -72,7 +72,8 @@
                     "firstname"  => 'First Name',
                     "lastname"   => 'Last Name',
                     "department" => 'Department',
-                    "loc_pos"    => 'Location / Position',
+                    "location"   => 'Location',
+                    "position"   => 'Position',
                     "username"   => t('all','Username'),
                  );
 
@@ -121,7 +122,7 @@
     $_SESSION['reportQuery'] = " WHERE " . implode(" AND ", $sql_WHERE);
     $_SESSION['reportType'] = "usernameListGeneric";
     
-    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'First Name', ui.lastname AS 'Last Name', ui.department AS 'Department', rc.username AS 'Username', rc.value AS 'Password'";
+    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'First Name', ui.lastname AS 'Last Name', ui.department AS 'Department', ui.company AS 'Location', ui.city AS 'Position', rc.username AS 'Username', rc.value AS 'Password'";
 
     $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.department, ui.company, ui.city,
                            rc.username AS username, rc.value AS auth, rc.attribute
@@ -341,10 +342,11 @@
 
             $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
             $department = htmlspecialchars($data['department'] ?? '', ENT_QUOTES, 'UTF-8');
-            $location_position = htmlspecialchars(trim($data['company'] . ' / ' . $data['city']), ENT_QUOTES, 'UTF-8');
+            $location = htmlspecialchars($data['company'] ?? '', ENT_QUOTES, 'UTF-8');
+            $position = htmlspecialchars($data['city'] ?? '', ENT_QUOTES, 'UTF-8');
 
             // define table row in the same order as the table headers
-            $table_row = array( $checkbox, $emp_id, $firstname, $lastname, $department, $location_position, $tooltip );
+            $table_row = array( $checkbox, $emp_id, $firstname, $lastname, $department, $location, $position, $tooltip );
 
             if (!$hiddenPassword) {
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
