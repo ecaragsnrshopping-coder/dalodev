@@ -132,8 +132,9 @@
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
     */
     // Fetch individual fields to concatenate in PHP
-    $sql = sprintf("SELECT ui.workphone, ui.firstname, ui.lastname, ui.company, ui.city,
-                           rc.username AS username, rc.value AS auth, rc.attribute
+    $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.company, ui.city,
+                           rc.username AS username, rc.value AS auth, rc.attribute,
+                           MAX(ra.acctstarttime) AS lastlogin
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
 
@@ -347,7 +348,7 @@
 
 //THISS update here
             // Extract workphone as Employee ID
-            $emp_id = htmlspecialchars($data['ui.workphone'] ?? '', ENT_QUOTES, 'UTF-8');
+            $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
 
             // create checkbox
             $d = array( 'name' => 'username[]', 'value' => $username );
@@ -365,7 +366,7 @@
             print_table_row($table_row);
 
             // create checkbox
-            d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
+            $d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
             $checkbox = get_checkbox_str($d);
 
             // define table row
