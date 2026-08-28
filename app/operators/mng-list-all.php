@@ -64,6 +64,7 @@
     // the variables cols, colspan, and half_colspan
     // can be used for validation an presentation purpose
     $cols = array(
+                    0 => 'selected',
                     //"id" => t('all','ID'), //delete
                     //"fullname" => t('all','Name'),
                     //"username" => t('all','Username'),
@@ -190,6 +191,8 @@
                 'workphone' => $row['workphone'],
 		        'firstname' => $row['firstname'],
                 'lastname' => $row['lastname'],
+                'company' => $row['company'],
+                'city' => $row['city'],
                 'enabled' => true,
                 'groups' => array(),
                 'type' => $type,
@@ -347,15 +350,16 @@
             $tooltip = get_tooltip_list_str($tooltip);
 
 //THISS update here
-            // Extract workphone as Employee ID
-            $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
-
             // create checkbox
             $d = array( 'name' => 'username[]', 'value' => $username );
             $checkbox = get_checkbox_str($d);
 
-            // define table row (Checkbox + Employee ID, Firstname, Lastname, Tooltip)
-            $table_row = array( $checkbox . ' ' . $emp_id, $firstname, $lastname, $tooltip );
+            $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
+            $fullname = trim($firstname . ' ' . $lastname);
+            $location_position = htmlspecialchars(trim($data['company'] . ' / ' . $data['city']), ENT_QUOTES, 'UTF-8');
+
+            // define table row (checkbox, employee ID, name, location/position, username)
+            $table_row = array( $checkbox, $emp_id, $fullname, $location_position, $tooltip );
 
             if (!$hiddenPassword) {
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
