@@ -120,7 +120,7 @@
     $_SESSION['reportType'] = "usernameListGeneric";
     
     // ADD THIS LINE HERE:
-    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password', MAX(ra.acctstarttime) AS 'Last Login Time'";
+    //$_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password', MAX(ra.acctstarttime) AS 'Last Login Time'";
     // we initialize $numrows
     //$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
     //                       CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname,
