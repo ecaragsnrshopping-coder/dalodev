@@ -120,7 +120,7 @@
     $_SESSION['reportType'] = "usernameListGeneric";
     
     // ADD THIS LINE HERE:
-    $_SESSION['reportQueryColumns'] = "ui workphone AS 'Employee ID', ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password', MAX(ra.acctstarttime) AS 'Last Login Time'";
+    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password', MAX(ra.acctstarttime) AS 'Last Login Time'";
     // we initialize $numrows
     //$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
     //                       CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname,
@@ -360,25 +360,26 @@
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
             }
 
-           // $table_row[] = $lastlogin;
-            //$table_row[] = $grouplist;
+            $table_row[] = $lastlogin;
+            $table_row[] = $grouplist;
+            print_table_row($table_row);
 
             // create checkbox
-            /*$d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
+            d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
             $checkbox = get_checkbox_str($d);
 
             // define table row
             //$table_row = array( $checkbox, $fullname, $tooltip ); */
-            $table_row = array( $checkbox, $firstname, $lastname, $tooltip );
-            if (!$hiddenPassword) {
-                $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
-            }
+            //$table_row = array( $checkbox, $firstname, $lastname, $tooltip );
+            //if (!$hiddenPassword) {
+            //    $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
+            //}
 
-            $table_row[] = $lastlogin;
-            $table_row[] = $grouplist;
+            //$table_row[] = $lastlogin;
+            //$table_row[] = $grouplist;
 
             // print table row
-            print_table_row($table_row);
+            //print_table_row($table_row);
 
             $count++;
         }
