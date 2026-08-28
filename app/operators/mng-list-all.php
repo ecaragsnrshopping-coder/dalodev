@@ -119,19 +119,8 @@
     $_SESSION['reportQuery'] = " WHERE " . implode(" AND ", $sql_WHERE);
     $_SESSION['reportType'] = "usernameListGeneric";
     
-    // ADD THIS LINE HERE:
     $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password'";
-    // we initialize $numrows
-    //$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
-    //                       CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname,
-    //                       MAX(ra.acctstarttime) AS lastlogin
-    /*$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
-                           ui.firstname, ui.lastname,
-                           MAX(ra.acctstarttime) AS lastlogin
-                     FROM %s %s
-                     GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
-    */
-    // Fetch individual fields to concatenate in PHP
+
     $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.company, ui.city,
                            rc.username AS username, rc.value AS auth, rc.attribute
                      FROM %s %s
