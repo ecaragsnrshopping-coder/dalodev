@@ -69,7 +69,9 @@
                     //"fullname" => t('all','Name'),
                     //"username" => t('all','Username'),
                     "workphone" => 'Employee ID',
-                    "fullname"   => 'Full Name',
+                    "firstname"  => 'First Name',
+                    "lastname"   => 'Last Name',
+                    "department" => 'Department',
                     "loc_pos"    => 'Location / Position',
                     "username"   => t('all','Username'),
                  );
@@ -119,9 +121,9 @@
     $_SESSION['reportQuery'] = " WHERE " . implode(" AND ", $sql_WHERE);
     $_SESSION['reportType'] = "usernameListGeneric";
     
-    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password'";
+    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'First Name', ui.lastname AS 'Last Name', ui.department AS 'Department', rc.username AS 'Username', rc.value AS 'Password'";
 
-    $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.company, ui.city,
+    $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.department, ui.company, ui.city,
                            rc.username AS username, rc.value AS auth, rc.attribute
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
@@ -178,6 +180,7 @@
                 'workphone' => $row['workphone'],
 		        'firstname' => $row['firstname'],
                 'lastname' => $row['lastname'],
+                'department' => $row['department'],
                 'company' => $row['company'],
                 'city' => $row['city'],
                 'enabled' => true,
@@ -337,11 +340,11 @@
             $checkbox = get_checkbox_str($d);
 
             $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
-            $fullname = trim($firstname . ' ' . $lastname);
+            $department = htmlspecialchars($data['department'] ?? '', ENT_QUOTES, 'UTF-8');
             $location_position = htmlspecialchars(trim($data['company'] . ' / ' . $data['city']), ENT_QUOTES, 'UTF-8');
 
-            // define table row (checkbox, employee ID, name, location/position, username)
-            $table_row = array( $checkbox, $emp_id, $fullname, $location_position, $tooltip );
+            // define table row in the same order as the table headers
+            $table_row = array( $checkbox, $emp_id, $firstname, $lastname, $department, $location_position, $tooltip );
 
             if (!$hiddenPassword) {
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
