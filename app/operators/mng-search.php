@@ -87,12 +87,13 @@
     // the variables cols, colspan, and half_colspan
     // can be used for validation an presentation purpose
     $cols = array(
-                    //"id" => t('all','ID'),
-                    //"fullname" => t('all','Name'),
-                    //"username" => t('all','Username'),
-                    "id" => t('all','ID'),
-                    "firstname" => 'Full Name',
-                    "lastname" => 'Location / Position',
+                    0 => 'selected',
+                    "workphone" => 'Employee ID',
+                    "firstname" => 'First Name',
+                    "lastname" => 'Last Name',
+                    "department" => 'Department',
+                    "location" => 'Location',
+                    "position" => 'Position',
                     "username" => t('all','Username'),
                  );
 
@@ -161,13 +162,11 @@
                                         $configValues['CONFIG_DB_TBL_RADREPLY'], $configValues['CONFIG_DB_TBL_DALOUSERINFO']);
     $_SESSION['reportQuery'] = " WHERE " . implode(" AND ", $sql_WHERE);
     $_SESSION['reportType'] = "usernameListGeneric";
+    $_SESSION['reportQueryColumns'] = "ui.workphone AS 'Employee ID', ui.firstname AS 'First Name', ui.lastname AS 'Last Name', ui.department AS 'Department', ui.company AS 'Location', ui.city AS 'Position', rc.username AS 'Username', rc.value AS 'Password'";
 
     // we initialize $numrows
-    //$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
-    //                       CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname,
-    //                       MAX(ra.acctstarttime) AS lastlogin
-    $sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
-                           ui.firstname, ui.lastname,
+    $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.department, ui.company, ui.city,
+                           rc.username AS username, rc.value AS auth, rc.attribute,
                            MAX(ra.acctstarttime) AS lastlogin
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
@@ -219,10 +218,13 @@
 
             $records[$this_username] = array(
                 'auth' => $row['auth'],
-                //'fullname' => $row['fullname'],
+                'workphone' => $row['workphone'],
                 'firstname' => $row['firstname'],
                 'lastname' => $row['lastname'],
-		'enabled' => true,
+                'department' => $row['department'],
+                'company' => $row['company'],
+                'city' => $row['city'],
+                'enabled' => true,
                 'groups' => array(),
                 'type' => $type,
                 'id' => $row['id'],
@@ -319,18 +321,16 @@
         print_table_top($form_descriptor);
 
         // second line of table header
-        printTableHead($cols, $orderBy, $orderType, $partial_query_string);
+        printTableHead($cols, $orderBy, $orderType);
 
         // closes table header, opens table body
         print_table_middle();
 
         // table content
         $count = 0;
-        $td_format = '<td>%s</td>';
         foreach ($records as $username => $data) {
             $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
             $type = $data['type'];
-            $id = intval($data['id']);
 
             $img_format = '<i class="bi bi-%s-circle-fill text-%s me-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="%s"></i>';
 
@@ -382,12 +382,16 @@
             $tooltip = get_tooltip_list_str($tooltip);
 
             // create checkbox
-            $d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
+            $d = array( 'name' => 'username[]', 'value' => $username );
             $checkbox = get_checkbox_str($d);
 
-            // define table row
-            //$table_row = array( $checkbox, $fullname, $tooltip );
-            $table_row = array( $checkbox, $firstname, $lastname, $tooltip );
+            $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
+            $department = htmlspecialchars($data['department'] ?? '', ENT_QUOTES, 'UTF-8');
+            $location = htmlspecialchars($data['company'] ?? '', ENT_QUOTES, 'UTF-8');
+            $position = htmlspecialchars($data['city'] ?? '', ENT_QUOTES, 'UTF-8');
+
+            // define table row in the same order as the table headers
+            $table_row = array( $checkbox, $emp_id, $firstname, $lastname, $department, $location, $position, $tooltip );
             if (!$hiddenPassword) {
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
             }
