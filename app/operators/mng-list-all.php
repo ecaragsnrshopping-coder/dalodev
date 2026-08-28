@@ -347,7 +347,7 @@
 
 //THISS update here
             // Extract workphone as Employee ID
-            $emp_id = htmlspecialchars($data['workphone'] ?? '', ENT_QUOTES, 'UTF-8');
+            $emp_id = htmlspecialchars($data['ui.workphone'] ?? '', ENT_QUOTES, 'UTF-8');
 
             // create checkbox
             $d = array( 'name' => 'username[]', 'value' => $username );
