@@ -78,7 +78,6 @@
         $cols["auth"] = t('all','Password');
     }
 
-    $cols["lastlogin"] = t('all','LastLoginTime');
     $cols[] = t('title','Groups');
 
     $colspan = count($cols);
@@ -114,14 +113,14 @@
     $sql_WHERE[] = sprintf("(%s)", implode(" OR ", $nested_condition1));
 
     // setup php session variables for exporting
-    $_SESSION['reportTable'] = sprintf("%s AS rc LEFT JOIN %s AS ra ON ra.username=rc.username, %s AS ui",
-                                       $configValues['CONFIG_DB_TBL_RADCHECK'], $configValues['CONFIG_DB_TBL_RADACCT'],
+    $_SESSION['reportTable'] = sprintf("%s AS rc, %s AS ui",
+                                       $configValues['CONFIG_DB_TBL_RADCHECK'],
                                        $configValues['CONFIG_DB_TBL_DALOUSERINFO']);
     $_SESSION['reportQuery'] = " WHERE " . implode(" AND ", $sql_WHERE);
     $_SESSION['reportType'] = "usernameListGeneric";
     
     // ADD THIS LINE HERE:
-    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password', MAX(ra.acctstarttime) AS 'Last Login Time'";
+    $_SESSION['reportQueryColumns'] = "ui.firstname AS 'Full Name', ui.lastname AS 'Location / Position', rc.username AS 'Username', rc.value AS 'Password'";
     // we initialize $numrows
     //$sql = sprintf("SELECT ui.id AS id, rc.username AS username, rc.value AS auth, rc.attribute,
     //                       CONCAT(COALESCE(ui.firstname, ''), ' ', COALESCE(ui.lastname, '')) AS fullname,
@@ -134,8 +133,7 @@
     */
     // Fetch individual fields to concatenate in PHP
     $sql = sprintf("SELECT ui.id, ui.workphone, ui.firstname, ui.lastname, ui.company, ui.city,
-                           rc.username AS username, rc.value AS auth, rc.attribute,
-                           MAX(ra.acctstarttime) AS lastlogin
+                           rc.username AS username, rc.value AS auth, rc.attribute
                      FROM %s %s
                      GROUP BY rc.username", $_SESSION['reportTable'], $_SESSION['reportQuery']);
 
@@ -197,7 +195,6 @@
                 'groups' => array(),
                 'type' => $type,
                 'id' => $row['id'],
-                'lastlogin' => $row['lastlogin'],
             );
             // in the same pass we init the $usernamelist
             $usernamelist[] = sprintf("'%s'", $dbSocket->escapeSimple($this_username));
@@ -292,8 +289,6 @@
         foreach ($records as $username => $data) {
             $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
             $type = $data['type'];
-            $id = intval($data['id']);
-
             $img_format = '<i class="bi bi-%s-circle-fill text-%s me-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="%s"></i>';
 
             $img = (!$data['enabled'])
@@ -324,8 +319,6 @@
             //$fullname = htmlspecialchars($data['fullname'], ENT_QUOTES, 'UTF-8');
             $firstname = htmlspecialchars($data['firstname'], ENT_QUOTES, 'UTF-8');
             $lastname = htmlspecialchars($data['lastname'], ENT_QUOTES, 'UTF-8');
-            $lastlogin = (!empty($data['lastlogin']))
-                       ? htmlspecialchars($data['lastlogin'], ENT_QUOTES, 'UTF-8') : "(n/a)";
             $grouplist = implode("<br>", $data['groups']);
 
             $ajax_id = "divContainerUserInfo_" . $count;
@@ -365,26 +358,8 @@
                 $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
             }
 
-            $table_row[] = $lastlogin;
             $table_row[] = $grouplist;
             print_table_row($table_row);
-
-            // create checkbox
-            $d = array( 'name' => 'username[]', 'value' => $username, 'label' => $id );
-            $checkbox = get_checkbox_str($d);
-
-            // define table row
-            //$table_row = array( $checkbox, $fullname, $tooltip ); */
-            //$table_row = array( $checkbox, $firstname, $lastname, $tooltip );
-            //if (!$hiddenPassword) {
-            //    $table_row[] = ($type == 'USER') ? $auth : "(n/a)";
-            //}
-
-            //$table_row[] = $lastlogin;
-            //$table_row[] = $grouplist;
-
-            // print table row
-            //print_table_row($table_row);
 
             $count++;
         }
