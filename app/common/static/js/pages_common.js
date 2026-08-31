@@ -365,7 +365,7 @@ function disableCheckbox(formName,pageDst) {
     }
 
     if (confirm("You are about to disable " + count + " users\nDo you want to continue?"))  {
-        ajaxGeneric("library/ajax/user_actions.php","userDisable","returnMessages",strUsernames);
+        ajaxGeneric("library/ajax/user_actions.php","userDisable=true","returnMessages",strUsernames);
         return true;
     }
 
@@ -392,7 +392,7 @@ function mailCheckbox(formName,pageDst) {
         return;
     }
     if (confirm("You are about to send " + count + " messages\nDo you want to continue?"))  {
-        ajaxGeneric("library/ajax/user_actions.php","userMail","returnMessages",strUsernames);
+        ajaxGeneric("library/ajax/user_actions.php","userMail=true","returnMessages",strUsernames);
         return true;
     }
     return false;
@@ -421,7 +421,7 @@ function enableCheckbox(formName,pageDst) {
     }
 
     if (confirm("You are about to enable " + count + " users\nDo you want to continue?"))  {
-        ajaxGeneric("library/ajax/user_actions.php","userEnable","returnMessages",strUsernames);
+        ajaxGeneric("library/ajax/user_actions.php","userEnable=true","returnMessages",strUsernames);
         return true;
     }
 

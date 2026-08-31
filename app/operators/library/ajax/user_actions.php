@@ -32,7 +32,11 @@ include_once('../../../common/includes/mail.php');
 $disabled_groupname = 'daloRADIUS-Disabled-Users';
 
 // username and divContainer are required
-if (array_key_exists('username', $_GET) && isset($_GET['username']) &&
+$username_param = (array_key_exists('username', $_GET) && isset($_GET['username']))
+    ? $_GET['username']
+    : ((array_key_exists('username[]', $_GET) && isset($_GET['username[]'])) ? $_GET['username[]'] : null);
+
+if ($username_param !== null &&
     array_key_exists('divContainer', $_GET) && isset($_GET['divContainer'])) {
 
     // divContainer id must begin with a letter ([A-Za-z]) and may be followed by any number of letters,
@@ -44,7 +48,7 @@ if (array_key_exists('username', $_GET) && isset($_GET['username']) &&
     $divContainer = $_GET['divContainer'];
 
     // username could contain a list of usernames
-    $tmp_usernames = (!is_array($_GET['username'])) ? array( $_GET['username'] ) : $_GET['username'];
+    $tmp_usernames = (!is_array($username_param)) ? array( $username_param ) : $username_param;
 
     $usernames = array();
 
@@ -63,17 +67,18 @@ if (array_key_exists('username', $_GET) && isset($_GET['username']) &&
 
     // we can handle these actions
     $action = "";
-    if (isset($_GET['userDisable'])) {
+    if (isset($_GET['userDisable']) || isset($_GET['userDisable=true'])) {
         $action = 'userDisable';
-    } else if (isset($_GET['refillSessionTime'])) {
+    } else if (isset($_GET['refillSessionTime']) || isset($_GET['refillSessionTime=true'])) {
         $action = 'refillSessionTime';
-    } else if (isset($_GET['refillSessionTraffic'])) {
+    } else if (isset($_GET['refillSessionTraffic']) || isset($_GET['refillSessionTraffic=true'])) {
         $action = 'refillSessionTraffic';
-    } else if (isset($_GET['checkDisabled'])) {
+    } else if (isset($_GET['checkDisabled']) || isset($_GET['checkDisabled=true'])) {
         $action = 'checkDisabled';
-    } else if (isset($_GET['userMail'])) {    // handle "Send Mail" button action
+    } else if (isset($_GET['userMail']) || isset($_GET['userMail=true'])) {    // handle "Send Mail" button action
         $action = 'userMail';
-    } else if (isset($_GET['checkDisabled'])){
+    } else if (isset($_GET['userEnable']) || isset($_GET['userEnable=true'])) {
+        $action = 'userEnable';
     } else {
         // this represents the default action
         $action = 'userEnable';
