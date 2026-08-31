@@ -388,8 +388,8 @@ function print_common_controls($name) {
 
     echo <<<EOF
 <div class="btn-group btn-group-sm" role="group">
-    <button type="button" class="btn btn-outline-primary btn-sm" onclick="{$js_function_name}('all')">Select All</button>
-    <button type="button" class="btn btn-outline-danger btn-sm" onclick="{$js_function_name}('none')">Select None</button>
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="{$js_function_name}('all')" style="min-width: 110px; text-align: center; white-space: nowrap;">Select All</button>
+    <button type="button" class="btn btn-outline-danger btn-sm" onclick="{$js_function_name}('none')" style="min-width: 110px; text-align: center; white-space: nowrap;">Select None</button>
 </div>
 
 <script>
@@ -412,7 +412,7 @@ EOF;
 function print_additional_controls($descriptors) {
     foreach ($descriptors as $d) {
         $class = (isset($d['class'])) ? $d['class'] : "btn-primary";
-        printf('<button class="btn btn-sm %s ms-1" type="button" onclick="%s">%s</button>', $class, $d['onclick'], $d['label']);
+        printf('<button class="btn btn-sm %s ms-1" type="button" onclick="%s" style="min-width: 110px; text-align: center; white-space: nowrap;">%s</button>', $class, $d['onclick'], $d['label']);
     }
 }
 
