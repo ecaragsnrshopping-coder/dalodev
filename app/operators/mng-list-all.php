@@ -271,46 +271,8 @@
         // print table top
         print_table_top($form_descriptor);
 
-    $cols[0] = '<input type="checkbox" class="form-check-input select-all-users" id="select-all-users" data-select-name="username[]" aria-label="Select all users">';
-
-    echo <<<EOF
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var masterBox = document.getElementById('select-all-users');
-        if (!masterBox) {
-            return;
-        }
-
-        var rowBoxes = function () {
-            return Array.prototype.slice.call(document.querySelectorAll('input[type="checkbox"][name="username[]"]'));
-        };
-
-        masterBox.addEventListener('click', function () {
-            var checked = masterBox.checked;
-            rowBoxes().forEach(function (box) {
-                box.checked = checked;
-            });
-        });
-
-        var syncMaster = function () {
-            var boxes = rowBoxes();
-            if (boxes.length === 0) {
-                masterBox.checked = false;
-                return;
-            }
-
-            var allChecked = boxes.every(function (box) {
-                return box.checked;
-            });
-            masterBox.checked = allChecked;
-        };
-
-        rowBoxes().forEach(function (box) {
-            box.addEventListener('change', syncMaster);
-        });
-    });
-</script>
-EOF;
+        // second line of table header
+        printTableHead($cols, $orderBy, $orderType);
 
         // closes table header, opens table body
         print_table_middle();
