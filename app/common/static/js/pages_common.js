@@ -330,7 +330,19 @@ function removeCheckbox(formName,pageDst) {
         return false;
 }
 
+function getSelectedUsernames() {
+    var form = document.getElementsByTagName('input');
+    var values = [];
 
+    for (var i = 0; i < form.length; ++i) {
+        var e = form[i];
+        if (e.type == 'checkbox' && e.checked && (e.name == 'username[]' || e.name == 'username')) {
+            values.push('username[]=' + encodeURIComponent(e.value));
+        }
+    }
+
+    return values.join('&');
+}
 
 
 /***********************************************************************
@@ -343,20 +355,8 @@ function removeCheckbox(formName,pageDst) {
  ***********************************************************************/
 function disableCheckbox(formName,pageDst) {
 
-        var count = 0;
-        var form = document.getElementsByTagName('input');
-    var values = "";
-
-        for (var i=0; i < form.length; ++i) {
-                var e = form[i];
-                if (e.type == 'checkbox' && e.checked) {
-            values += "username[]=" + e.value + "&";
-                    ++count;
-        }
-        }
-
-    var strUsernames = values.substr(0,values.length-1);
-
+    var strUsernames = getSelectedUsernames();
+    var count = (strUsernames === '') ? 0 : strUsernames.split('username%5B%5D=').length - 1;
 
     // if no items were checked there's no reason to submit the form
     if (count == 0) {
@@ -364,16 +364,12 @@ function disableCheckbox(formName,pageDst) {
         return;
     }
 
-
-        if (confirm("You are about to disable " + count + " users\nDo you want to continue?"))  {
-
+    if (confirm("You are about to disable " + count + " users\nDo you want to continue?"))  {
         ajaxGeneric("library/ajax/user_actions.php","userDisable","returnMessages",strUsernames);
-
         return true;
+    }
 
-        }
-
-        return false;
+    return false;
 }
 
 
@@ -387,19 +383,8 @@ function disableCheckbox(formName,pageDst) {
  ***********************************************************************/
 function mailCheckbox(formName,pageDst) {
 
-    var count = 0;
-    var form = document.getElementsByTagName('input');
-    var values = "";
-
-    for (var i=0; i < form.length; ++i) {
-        var e = form[i];
-        if (e.type == 'checkbox' && e.checked) {
-            values += "username[]=" + e.value + "&";
-            ++count;
-        }
-    }
-
-    var strUsernames = values.substr(0,values.length-1);
+    var strUsernames = getSelectedUsernames();
+    var count = (strUsernames === '') ? 0 : strUsernames.split('username%5B%5D=').length - 1;
 
     // if no items were checked there's no reason to submit the form
     if (count == 0) {
@@ -426,20 +411,8 @@ function mailCheckbox(formName,pageDst) {
  ***********************************************************************/
 function enableCheckbox(formName,pageDst) {
 
-        var count = 0;
-        var form = document.getElementsByTagName('input');
-    var values = "";
-
-        for (var i=0; i < form.length; ++i) {
-                var e = form[i];
-                if (e.type == 'checkbox' && e.checked) {
-            values += "username[]=" + e.value + "&";
-                    ++count;
-        }
-        }
-
-    var strUsernames = values.substr(0,values.length-1);
-
+    var strUsernames = getSelectedUsernames();
+    var count = (strUsernames === '') ? 0 : strUsernames.split('username%5B%5D=').length - 1;
 
     // if no items were checked there's no reason to submit the form
     if (count == 0) {
@@ -447,16 +420,12 @@ function enableCheckbox(formName,pageDst) {
         return;
     }
 
-
-        if (confirm("You are about to enable " + count + " users\nDo you want to continue?"))  {
-
+    if (confirm("You are about to enable " + count + " users\nDo you want to continue?"))  {
         ajaxGeneric("library/ajax/user_actions.php","userEnable","returnMessages",strUsernames);
-
         return true;
+    }
 
-        }
-
-        return false;
+    return false;
 }
 
 
