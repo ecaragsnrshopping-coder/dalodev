@@ -387,9 +387,9 @@ function print_common_controls($name) {
     $js_function_name = "select_" . rand();
 
     echo <<<EOF
-<div class="btn-group btn-group-sm" role="group" style="gap: 0.25rem;">
-    <button type="button" class="btn btn-outline-primary btn-sm" onclick="{$js_function_name}('all')" style="min-width: 110px; text-align: center;">Select All</button>
-    <button type="button" class="btn btn-outline-danger btn-sm" onclick="{$js_function_name}('none')" style="min-width: 110px; text-align: center;">Select None</button>
+<div class="btn-group btn-group-sm" role="group">
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="{$js_function_name}('all')">Select All</button>
+    <button type="button" class="btn btn-outline-danger btn-sm" onclick="{$js_function_name}('none')">Select None</button>
 </div>
 
 <script>
@@ -412,7 +412,7 @@ EOF;
 function print_additional_controls($descriptors) {
     foreach ($descriptors as $d) {
         $class = (isset($d['class'])) ? $d['class'] : "btn-primary";
-        printf('<button class="btn btn-sm %s ms-1" type="button" onclick="%s" style="min-width: 110px; text-align: center;">%s</button>', $class, $d['onclick'], $d['label']);
+        printf('<button class="btn btn-sm %s ms-1" type="button" onclick="%s">%s</button>', $class, $d['onclick'], $d['label']);
     }
 }
 
