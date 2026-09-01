@@ -32,24 +32,19 @@ include_once('../../../common/includes/mail.php');
 $disabled_groupname = 'daloRADIUS-Disabled-Users';
 
 // username and divContainer are required
-// The AJAX layer uses POST by default, so support both GET and POST request data.
-$username_param = (array_key_exists('username', $_REQUEST) && isset($_REQUEST['username']))
-    ? $_REQUEST['username']
-    : ((array_key_exists('username[]', $_REQUEST) && isset($_REQUEST['username[]'])) ? $_REQUEST['username[]'] : null);
-
-if ($username_param !== null &&
-    array_key_exists('divContainer', $_REQUEST) && isset($_REQUEST['divContainer'])) {
+if (array_key_exists('username', $_GET) && isset($_GET['username']) &&
+    array_key_exists('divContainer', $_GET) && isset($_GET['divContainer'])) {
 
     // divContainer id must begin with a letter ([A-Za-z]) and may be followed by any number of letters,
     // digits ([0-9]), hyphens ("-"), underscores ("_").
-    if (!preg_match('/[A-Za-z][A-Za-z0-9_-]+/', $_REQUEST['divContainer'])) {
+    if (!preg_match('/[A-Za-z][A-Za-z0-9_-]+/', $_GET['divContainer'])) {
         exit;
     }
 
-    $divContainer = $_REQUEST['divContainer'];
+    $divContainer = $_GET['divContainer'];
 
     // username could contain a list of usernames
-    $tmp_usernames = (!is_array($username_param)) ? array( $username_param ) : $username_param;
+    $tmp_usernames = (!is_array($_GET['username'])) ? array( $_GET['username'] ) : $_GET['username'];
 
     $usernames = array();
 
@@ -68,18 +63,17 @@ if ($username_param !== null &&
 
     // we can handle these actions
     $action = "";
-    if (isset($_REQUEST['userDisable']) || isset($_REQUEST['userDisable=true'])) {
+    if (isset($_GET['userDisable'])) {
         $action = 'userDisable';
-    } else if (isset($_REQUEST['refillSessionTime']) || isset($_REQUEST['refillSessionTime=true'])) {
+    } else if (isset($_GET['refillSessionTime'])) {
         $action = 'refillSessionTime';
-    } else if (isset($_REQUEST['refillSessionTraffic']) || isset($_REQUEST['refillSessionTraffic=true'])) {
+    } else if (isset($_GET['refillSessionTraffic'])) {
         $action = 'refillSessionTraffic';
-    } else if (isset($_REQUEST['checkDisabled']) || isset($_REQUEST['checkDisabled=true'])) {
+    } else if (isset($_GET['checkDisabled'])) {
         $action = 'checkDisabled';
-    } else if (isset($_REQUEST['userMail']) || isset($_REQUEST['userMail=true'])) {    // handle "Send Mail" button action
+    } else if (isset($_GET['userMail'])) {    // handle "Send Mail" button action
         $action = 'userMail';
-    } else if (isset($_REQUEST['userEnable']) || isset($_REQUEST['userEnable=true'])) {
-        $action = 'userEnable';
+    } else if (isset($_GET['checkDisabled'])){
     } else {
         // this represents the default action
         $action = 'userEnable';
