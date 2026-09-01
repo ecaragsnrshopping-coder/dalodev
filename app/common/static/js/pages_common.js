@@ -330,18 +330,40 @@ function removeCheckbox(formName,pageDst) {
         return false;
 }
 
-function getSelectedUsernames() {
-    var form = document.getElementsByTagName('input');
+function getSelectedUsernames(formName) {
     var values = [];
+    var selected = [];
+    var boxes = [];
 
-    for (var i = 0; i < form.length; ++i) {
-        var e = form[i];
-        if (e.type == 'checkbox' && e.checked && (e.name == 'username[]' || e.name == 'username')) {
-            values.push('username[]=' + encodeURIComponent(e.value));
+    if (document.querySelectorAll) {
+        boxes = document.querySelectorAll('input[type="checkbox"][name="username[]"]:checked');
+        if (boxes.length === 0) {
+            boxes = document.querySelectorAll('input[type="checkbox"][name="username"]:checked');
         }
     }
 
-    return values.join('&');
+    if (boxes.length === 0) {
+        var form = (document.forms && formName && document.forms[formName]) ? document.forms[formName] : document;
+        var inputs = form.getElementsByTagName ? form.getElementsByTagName('input') : document.getElementsByTagName('input');
+
+        for (var i = 0; i < inputs.length; ++i) {
+            var e = inputs[i];
+            if (e.type == 'checkbox' && (e.name == 'username[]' || e.name == 'username') && e.checked) {
+                boxes.push(e);
+            }
+        }
+    }
+
+    for (var i = 0; i < boxes.length; ++i) {
+        var e = boxes[i];
+        selected.push(e);
+        values.push('username[]=' + encodeURIComponent(e.value));
+    }
+
+    return {
+        count: selected.length,
+        paramString: values.join('&')
+    };
 }
 
 
@@ -355,8 +377,9 @@ function getSelectedUsernames() {
  ***********************************************************************/
 function disableCheckbox(formName,pageDst) {
 
-    var strUsernames = getSelectedUsernames();
-    var count = (strUsernames === '') ? 0 : strUsernames.split('username%5B%5D=').length - 1;
+    var selection = getSelectedUsernames(formName);
+    var count = selection.count;
+    var strUsernames = selection.paramString;
 
     // if no items were checked there's no reason to submit the form
     if (count == 0) {
@@ -383,8 +406,9 @@ function disableCheckbox(formName,pageDst) {
  ***********************************************************************/
 function mailCheckbox(formName,pageDst) {
 
-    var strUsernames = getSelectedUsernames();
-    var count = (strUsernames === '') ? 0 : strUsernames.split('username%5B%5D=').length - 1;
+    var selection = getSelectedUsernames(formName);
+    var count = selection.count;
+    var strUsernames = selection.paramString;
 
     // if no items were checked there's no reason to submit the form
     if (count == 0) {
@@ -411,8 +435,9 @@ function mailCheckbox(formName,pageDst) {
  ***********************************************************************/
 function enableCheckbox(formName,pageDst) {
 
-    var strUsernames = getSelectedUsernames();
-    var count = (strUsernames === '') ? 0 : strUsernames.split('username%5B%5D=').length - 1;
+    var selection = getSelectedUsernames(formName);
+    var count = selection.count;
+    var strUsernames = selection.paramString;
 
     // if no items were checked there's no reason to submit the form
     if (count == 0) {
